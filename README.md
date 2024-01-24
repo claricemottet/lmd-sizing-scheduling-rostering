@@ -16,7 +16,7 @@ You can also cite this repository through Zenodo:
     title={{Code for the Paper ``Tactical workforce sizing and scheduling decisions for last-mile delivery''}},
     author={Mandal, Minakshi Pundam and Santini, Alberto and Archetti, Claudia},
     year=2024,
-    doi={TODO},
+    doi={10.5281/zenodo.10561003},
     url={https://github.com/alberto-santini/lmd-sizing-scheduling}
 }
 ```
