@@ -2,20 +2,20 @@
 
 This repository contains the instance generator, the instances, the solver, the solutions and the scripts used to create the figures presented in the following paper:
 ```bib
-@techreport{TODO,
+@techreport{msa2024,
     title={Tactical workforce sizing and scheduling decisions for last-mile delivery},
-    author={TODO},
-    year={2024},
-    url={TODO}
+    author={Mandal, Minakshi Pundam and Santini, Alberto and Archetti, Claudia},
+    year=2024,
+    url={...}
 }
 ```
 
 You can also cite this repository through Zenodo:
 ```bib
-@misc{TODO,
+@misc{msa2024code,
     title={{Code for the Paper ``Tactical workforce sizing and scheduling decisions for last-mile delivery''}},
-    author={TODO},
-    year={2024},
+    author={Mandal, Minakshi Pundam and Santini, Alberto and Archetti, Claudia},
+    year=2024,
     doi={TODO},
     url={https://github.com/alberto-santini/lmd-sizing-scheduling}
 }
