@@ -6,7 +6,7 @@ This repository contains the instance generator, the instances, the solver, the 
     title={Tactical workforce sizing and scheduling decisions for last-mile delivery},
     author={Mandal, Minakshi Pundam and Santini, Alberto and Archetti, Claudia},
     year=2024,
-    url={...}
+    url={https://optimization-online.org/?p=25423}
 }
 ```
 
