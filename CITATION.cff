@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this code or these instances, please cite as below."
+authors:
+- family-names: "Mandal"
+  given names: "Minakshi Punam"
+- family-names: "Santini"
+  given-names: "Alberto"
+  orcid: "https://orcid.org/0000-0002-0440-0357"
+- family-names: "Archetti"
+  given-names: "Claudia"
+title: "Code and instances for the paper 'Tactical workforce sizing and scheduling decisions for last-mile delivery'"
+version: 1.0
+doi: 10.5281/zenodo.10561003
+date-released: 2024-01-25
+url: "https://github.com/alberto-santini/lmd-sizing-scheduling"
+preferred-citation:
+  type: report
+  authors:
+  - family-names: "Mandal"
+    given names: "Minakshi Punam"
+  - family-names: "Santini"
+    given-names: "Alberto"
+    orcid: "https://orcid.org/0000-0002-0440-0357"
+  - family-names: "Archetti"
+    given-names: "Claudia"
+  journal: "Optimization Online"
+  title: "Tactical workforce sizing and scheduling decisions for last-mile delivery"
+  year: 2024
