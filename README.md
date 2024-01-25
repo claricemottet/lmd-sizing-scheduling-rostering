@@ -1,5 +1,7 @@
 # Tactical workforce sizing and scheduling decisions for last-mile delivery
 
+[![DOI](https://zenodo.org/badge/746964619.svg)](https://zenodo.org/doi/10.5281/zenodo.10561002)
+
 This repository contains the instance generator, the instances, the solver, the solutions and the scripts used to create the figures presented in the following paper:
 ```bib
 @techreport{msa2024,
