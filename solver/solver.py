@@ -39,7 +39,7 @@ class Instance:
     ub_reg: dict
     ub_global: int
     shifts: Optional[list]
-    max_n_shifts = Optional[int]
+    max_n_shifts: Optional[int]
     instance_file: str
     model: str
     name: str
@@ -241,7 +241,7 @@ class Solver:
             sum(self.zplus[a, theta + shift_len - 1] for a in self.i.reg_areas[region])
             for region in self.i.regions
             for theta in self.i.periods
-            if theta < self.i.n_periods - 1 - shift_len
+            if theta < self.i.n_periods + 1 - shift_len
         ), name='fix_region_n_couriers_in_shift')
 
         self.m.addConstrs((
@@ -269,7 +269,7 @@ class Solver:
         else:
             return NotImplementedError('Shift length only implemented for n_periods == 8')
 
-        w_idx = range(self.i.n_periods - shift_len - 1)
+        w_idx = range(self.i.n_periods - shift_len + 1)
         self.w = self.m.addVars(w_idx, vtype=GRB.BINARY, name='w')
 
         self.m.addConstrs((
