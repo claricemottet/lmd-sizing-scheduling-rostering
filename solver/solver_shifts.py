@@ -59,7 +59,6 @@ class Instance:
 
         self.i = self.__load_instance(self.instance_file)
         self.__compute_data(**kwargs)
-        print("in instance")
 
     def __compute_data(self, **kwargs) -> None:
         if self.args is None:
@@ -170,12 +169,13 @@ class Solver:
     def __init__(self, args: Namespace, i: Instance):
         self.args = args
         self.i = i
-        print("in solver")
 
     def __build_base_model(self) -> None:
 
         #objective function
         self.m = Model()
+        #stopping output
+        self.m.setParam('OutputFlag', 0)
         self.x = self.m.addVars(self.i.areas, self.i.periods, vtype=GRB.INTEGER, lb=0, obj=1, name='x')
         self.omega = self.m.addVars(self.i.areas, self.i.periods, self.i.scenarios, vtype=GRB.CONTINUOUS, obj=1/self.i.n_scenarios, name='omega')
 
@@ -517,8 +517,8 @@ class Solver:
 
         for val in basic_output.keys():
             output[val] = basic_output[val]*n_rows
-        print(output.keys())
-        print(len(output['region']))
+        # print(output.keys())
+        # print(len(output['region']))
         return output
 
     def __flex_output(self) -> dict:
@@ -553,8 +553,8 @@ class Solver:
 
         for val in basic_output.keys():
             output[val] = basic_output[val]*n_rows
-        print(output.keys())
-        print(len(output['zminus__a_theta']))
+        # print(output.keys())
+        # print(len(output['zminus__a_theta']))
         return output
 
     def solve_fixed_output(self) -> dict:
