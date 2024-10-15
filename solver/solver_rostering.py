@@ -557,25 +557,32 @@ class Solver:
             # Instance
             'instance': self.i.ibasename,
             'city': self.i.ibasename.split('_')[0],
+
             'demand_baseline_weekday': self.i.i_weekday['demand_baseline'],
             'demand_baseline_weekend': self.i.i_weekend['demand_baseline'],
+            'hmin': self.i.h_min,
+            'hmax': self.i.h_max,
+            'max_n_diff': self.i.b_max,
+
+            'model': self.i.model,
+            'max_n_shifts': self.i.max_n_shifts,
+
             'OC': self.args.outsourcing_cost_multiplier,
             'RM': self.i.reg_multiplier,
             'GM': self.i.glb_multiplier,
-            'model': self.args.model,
+            'model_arg': self.args.model,
 
             'elapsed_time': self.m.Runtime,
             'n_variables': self.m.NumVars,
             'n_constraints': self.m.NumConstrs,
             'n_nonzeroes': self.m.NumNZs,
+            
             'regions': self.i.regions,
             'employees': self.i.employees,
             'reg_areas': self.i.reg_areas,
             'days': self.i.days,
             'shifts': self.i.shifts,            
             'periods': self.i.periods,
-            'hmin': self.i.h_min,
-            'hmax': self.i.h_max,
 
             # Model output
             'obj_val': self.m.ObjVal, 
@@ -621,25 +628,32 @@ class Solver:
             # Instance
             'instance': self.i.ibasename,
             'city': self.i.ibasename.split('_')[0],
+
             'demand_baseline_weekday': self.i.i_weekday['demand_baseline'],
             'demand_baseline_weekend': self.i.i_weekend['demand_baseline'],
+            'hmin': self.i.h_min,
+            'hmax': self.i.h_max,
+            'max_n_diff': self.i.b_max,
+
+            'model': self.i.model,
+            'max_n_shifts': self.i.max_n_shifts,
+            
             'OC': self.args.outsourcing_cost_multiplier,
             'RM': self.i.reg_multiplier,
             'GM': self.i.glb_multiplier,
-            'model': self.args.model,
+            'model_arg': self.args.model,
 
             'elapsed_time': self.m.Runtime,
             'n_variables': self.m.NumVars,
             'n_constraints': self.m.NumConstrs,
             'n_nonzeroes': self.m.NumNZs,
+            
             'regions': self.i.regions,
             'employees': self.i.employees,
             'reg_areas': self.i.reg_areas,
             'days': self.i.days,
             'shifts': self.i.shifts,            
             'periods': self.i.periods,
-            'hmin': self.i.h_min,
-            'hmax': self.i.h_max,
 
             # Model output
             'obj_val': self.m.ObjVal, 
@@ -647,7 +661,7 @@ class Solver:
             'gap': self.m.MIPGap,
             # Decision vars
             'k': k, 
-            'omega': omega, 
+            'omega': omega,
             'r': r, 
             'U': U,
         }
