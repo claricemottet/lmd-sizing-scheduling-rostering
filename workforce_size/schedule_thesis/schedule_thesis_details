@@ -1,0 +1,10 @@
+Schedule_thesis
+
+Demand:
+Weekday - Doublepeak
+Weekend - Uniform
+
+Constraints:
+Min hours: 32
+Max hours: 40
+Max differing start times: 3
