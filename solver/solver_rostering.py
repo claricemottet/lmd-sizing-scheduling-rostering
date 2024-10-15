@@ -376,7 +376,7 @@ class Solver:
     def __build_baseline_model(self) -> None:
         self.m = Model()
 
-        #k decision variable (e,a,theta,d)
+        #k decision variable (e,a,theta,day)
         self.k = {(employee, area, theta, day): self.m.addVar(vtype = GRB.BINARY, obj = 1, name = 'k')
                   for region in self.i.regions
                   for employee in self.i.employees[region]
@@ -553,103 +553,43 @@ class Solver:
             if value.X > 0:
                 omega[key] = value.X
 
-        output = {
-            'instance': [self.i.ibasename],
-            'city': [self.i.ibasename.split('_')[0]],
-            'demand_baseline': [self.i.i_weekday['demand_baseline']],
-            'outsourcing_cost_multiplier': [self.args.outsourcing_cost_multiplier],
-            'region_multiplier': [self.i.reg_multiplier],
-            'global_multiplier': [self.i.glb_multiplier],
-            'model': [self.args.model],
+        basic_output = {
+            # Instance
+            'instance': self.i.ibasename,
+            'city': self.i.ibasename.split('_')[0],
+            'demand_baseline_weekday': self.i.i_weekday['demand_baseline'],
+            'demand_baseline_weekend': self.i.i_weekend['demand_baseline'],
+            'OC': self.args.outsourcing_cost_multiplier,
+            'RM': self.i.reg_multiplier,
+            'GM': self.i.glb_multiplier,
+            'model': self.args.model,
+
             'elapsed_time': self.m.Runtime,
             'n_variables': self.m.NumVars,
             'n_constraints': self.m.NumConstrs,
             'n_nonzeroes': self.m.NumNZs,
+            'regions': self.i.regions,
+            'employees': self.i.employees,
+            'reg_areas': self.i.reg_areas,
+            'days': self.i.days,
+            'shifts': self.i.shifts,            
+            'periods': self.i.periods,
+            'hmin': self.i.h_min,
+            'hmax': self.i.h_max,
+
+            # Model output
+            'obj_val': self.m.ObjVal, 
+            'status': self.m.status, 
+            'gap': self.m.MIPGap,
+            # Decision vars
             'k': k, 
-            'omega': omega, 
+            'omega': omega
         }
-        if self.i.model == 'partflex':
-            output['max_n_shifts'] = [self.i.max_n_shifts]
-        else:
-            output['max_n_shifts'] = [np.nan]
-        return output
 
-    def __roster_objval(self) -> dict:
-        basic_output = self.__basic_output()
-
-        total_employees = 0
-        for region in self.i.regions:
-            total_employees += self.i.n_employees[region]
-        basic_output['workforce_size'] = [total_employees]
-
-        #can only get optimal value if there was one
-        if self.m.Status == GRB.OPTIMAL:
-            k = sum(self.k[(employee, area, theta, day)].X for region in self.i.regions for area in self.i.reg_areas[region] for employee in self.i.employees[region] for day in self.i.days for theta in self.i.periods[day])
-            basic_output['wage_costs'] = [k]
-            basic_output['objective_value'] = [self.m.ObjVal]
-            basic_output['objective_value_post_wage'] = [self.m.ObjVal - k]
-        else:
-            basic_output['wage_costs'] = [np.nan]
-            basic_output['objective_value'] = [np.nan]
-            basic_output['objective_value_post_wage'] = [np.nan]
+        # if self.m.Status == GRB.OPTIMAL:
+        #     basic_output['obj_val'] = self.m.ObjVal
         
         return basic_output
-
-    def __roster_output(self) -> dict:
-        basic_output = self.__roster_results()
-
-        check_output = {}
-        for key in basic_output.keys():
-            check_output[key] = basic_output[key]
-        check_output['region'] = []
-        check_output['employee'] = []
-        check_output['day'] = []
-        check_output['sum_r'] = []
-        check_output['shift_start'] = []
-        for region in self.i.regions:
-            for employee in self.i.employees[region]:
-                for day in self.i.days:
-                    sum_r = 0
-                    shift_start_ = 0
-                    for shift_start in self.i.shifts[region, day]:
-                        if self.m.Status == GRB.OPTIMAL:
-                            sum_r += int(self.r[(employee, shift_start, day)].X)
-                            if int(self.r[(employee, shift_start, day)].X) > .9:
-                                shift_start_ = shift_start
-                    check_output['region'].append(region)
-                    check_output['employee'].append(employee)
-                    check_output['day'].append(day)
-                    check_output['sum_r'].append(sum_r)
-                    check_output['shift_start'].append(shift_start_)
-
-        # check_output['sum_k'] = []
-        # check_output['k_worked'] = []
-        # for region in self.i.regions:
-        #     for employee in self.i.employees[region]:
-        #         for day in self.i.days:
-        #             sum_k = 0
-        #             k_worked = []
-        #             for theta in self.i.periods[day]:
-        #                 if sum_r > 0:
-        #                     k = sum(
-        #                         self.k[(employee, area, theta, day)].X
-        #                         for area in self.i.reg_areas[region]
-        #                     )
-        #                 else:
-        #                     k = 0
-
-        #                 sum_k += k
-        #                 if k > .9:
-        #                     k_worked.append(theta)
-        #             check_output['sum_k'].append(sum_k)
-        #             check_output['k_worked'].append(k_worked)
-        #             check_output['k_worked'].sort()
-
-        len_ = len(check_output['region'])
-        for key in basic_output.keys():
-            check_output[key] = check_output[key]*len_
-
-        return check_output
 
     def __roster_output(self):
         #decision variables
@@ -677,21 +617,30 @@ class Solver:
             if value.X > 0:
                 U[key] = value.X
 
-        results = {
+        roster_output = {
             # Instance
+            'instance': self.i.ibasename,
+            'city': self.i.ibasename.split('_')[0],
+            'demand_baseline_weekday': self.i.i_weekday['demand_baseline'],
+            'demand_baseline_weekend': self.i.i_weekend['demand_baseline'],
+            'OC': self.args.outsourcing_cost_multiplier,
+            'RM': self.i.reg_multiplier,
+            'GM': self.i.glb_multiplier,
+            'model': self.args.model,
+
             'elapsed_time': self.m.Runtime,
             'n_variables': self.m.NumVars,
             'n_constraints': self.m.NumConstrs,
             'n_nonzeroes': self.m.NumNZs,
             'regions': self.i.regions,
-            'reg_areas': self.i.reg_areas,
-            'shifts': self.i.shifts,
-            'days': self.i.days,
             'employees': self.i.employees,
-            'area': self.i.reg_areas,
+            'reg_areas': self.i.reg_areas,
+            'days': self.i.days,
+            'shifts': self.i.shifts,            
             'periods': self.i.periods,
-            'hmax': self.i.h_max,
             'hmin': self.i.h_min,
+            'hmax': self.i.h_max,
+
             # Model output
             'obj_val': self.m.ObjVal, 
             'status': self.m.status, 
@@ -703,21 +652,14 @@ class Solver:
             'U': U,
         }
 
-        return results
+        return roster_output
 
 
-    def solve_roster_objval(self) -> dict:
-        self.__build_baseline_model()
-        self.__build_roster_model()
-        self.m.setParam("OutputFlag", 0) # No logs
-        self.m.optimize()
-        return self.__roster_objval()
-
-    def solve_baseline_objval(self) -> dict:
+    def solve_baseline_output(self) -> dict:
         self.__build_baseline_model()
         self.m.setParam("OutputFlag", 0) # No logs
         self.m.optimize()
-        return self.__roster_objval()
+        return self.__basic_output()
 
     def solve_roster_output(self) -> dict:
         self.__build_baseline_model()
@@ -726,8 +668,27 @@ class Solver:
         self.m.optimize()
         return self.__roster_output()
 
+    #with MIP gap
+    def solve_baseline_output_w_gap(self) -> dict:
+        self.__build_baseline_model()
+        self.m.setParam("OutputFlag", 0) # No logs
+        self.m.setParam('MIPGap', 0.01) # within 1% of the optimal solution
+        self.m.optimize()
+        return self.__basic_output()
+
+    #with MIP gap
+    def solve_roster_output_w_gap(self) -> dict:
+        self.__build_baseline_model()
+        self.__build_roster_model()
+        self.m.setParam("OutputFlag", 0) # No logs
+        self.m.setParam('MIPGap', 0.01) # within 1% of the optimal solution
+        self.m.optimize()
+        return self.__roster_output()
+
 #function call run execution
-def run_roster_solver_objval(model, instance_file_weekday, shift_file_weekday, instance_file_weekend, shift_file_weekend, workforce_dict, outsourcing_cost_multiplier, regional_multiplier, global_multiplier, h_min, h_max, max_n_diff, max_n_shifts=None, expand_workforce_to_regions=None):
+
+#function for workforce size, just for determining the objective value ideally
+def run_objval(model, instance_file_weekday, shift_file_weekday, instance_file_weekend, shift_file_weekend, workforce_dict, outsourcing_cost_multiplier, regional_multiplier, global_multiplier, h_min, h_max, max_n_diff, max_n_shifts=None, expand_workforce_to_regions=None):
     args = Namespace(
         model=model,
         instance_file_weekday=instance_file_weekday,
@@ -751,11 +712,41 @@ def run_roster_solver_objval(model, instance_file_weekday, shift_file_weekday, i
     i = Instance(args=args)
     solver = Solver(args=args, i=i)
 
-    roster_results = solver.solve_roster_objval()
+    roster_results = solver.solve_roster_output()
 
     return roster_results
 
-def run_roster_solver_objval_w_baseline(model, instance_file_weekday, 
+def run_objval_w_gap(model, instance_file_weekday, shift_file_weekday, instance_file_weekend, shift_file_weekend, workforce_dict, outsourcing_cost_multiplier, regional_multiplier, global_multiplier, h_min, h_max, max_n_diff, max_n_shifts=None, expand_workforce_to_regions=None):
+    args = Namespace(
+        model=model,
+        instance_file_weekday=instance_file_weekday,
+        shift_file_weekday = shift_file_weekday,
+        instance_file_weekend=instance_file_weekend,
+        shift_file_weekend = shift_file_weekend,
+
+        expand_workforce_to_regions=expand_workforce_to_regions,
+        workforce_dict = workforce_dict,
+
+        outsourcing_cost_multiplier=outsourcing_cost_multiplier,
+        regional_multiplier=regional_multiplier,
+        global_multiplier=global_multiplier,
+
+        h_min = h_min,
+        h_max = h_max,
+        max_n_diff = max_n_diff,
+        max_n_shifts=max_n_shifts
+    )
+
+    i = Instance(args=args)
+    solver = Solver(args=args, i=i)
+
+    roster_results = solver.solve_roster_output_w_gap()
+
+    return roster_results
+
+
+#for determining results
+def run_output(model, instance_file_weekday, 
                                         shift_file_weekday, instance_file_weekend, 
                                         shift_file_weekend, workforce_dict, 
                                         outsourcing_cost_multiplier, regional_multiplier, global_multiplier, 
@@ -784,12 +775,13 @@ def run_roster_solver_objval_w_baseline(model, instance_file_weekday,
     i = Instance(args=args)
     solver = Solver(args=args, i=i)
 
-    baseline_results = solver.solve_baseline_objval()
+    baseline_results = solver.solve_baseline_output()
     roster_results = solver.solve_roster_output()
 
     return baseline_results, roster_results
 
-def run_roster_solver_output(model, instance_file_weekday, shift_file_weekday, instance_file_weekend, shift_file_weekend, workforce_dict, outsourcing_cost_multiplier, regional_multiplier, global_multiplier, h_min, h_max, max_n_diff, max_n_shifts=None, expand_workforce_to_regions=None):
+#for determining results with gap
+def run_output_w_gap(model, instance_file_weekday, shift_file_weekday, instance_file_weekend, shift_file_weekend, workforce_dict, outsourcing_cost_multiplier, regional_multiplier, global_multiplier, h_min, h_max, max_n_diff, max_n_shifts=None, expand_workforce_to_regions=None):
     args = Namespace(
         model=model,
         instance_file_weekday=instance_file_weekday,
@@ -814,6 +806,7 @@ def run_roster_solver_output(model, instance_file_weekday, shift_file_weekday, i
     i = Instance(args=args)
     solver = Solver(args=args, i=i)
 
-    roster_results, jonny_results = solver.solve_roster_output()
+    baseline_results = solver.solve_baseline_output_w_gap()
+    roster_results = solver.solve_roster_output_w_gap()
 
-    return roster_results, jonny_results
+    return baseline_results, roster_results
