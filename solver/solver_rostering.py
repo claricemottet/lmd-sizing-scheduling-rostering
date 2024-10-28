@@ -98,7 +98,7 @@ class Instance:
     instance_file_weekend: str #where all the information comes from
     shift_file_weekend: str #where region/shift information comes from
 
-    expand_workforce_to_regions = Optional[bool] #indicator to read in optiman workforce size
+    optimal_workforce_size_method = Optional[bool] #indicator to read in optiman workforce size
     workforce_file: Optional[str]
     workforce_dict: dict
     population: dict
@@ -113,7 +113,7 @@ class Instance:
             self.instance_file_weekend = kwargs['instance_file_weekend']
             self.shift_file_weekend = kwargs['shift_file_weekend']
 
-            self.expand_workforce_to_regions = kwargs['expand_workforce_to_regions']            
+            self.optimal_workforce_size_method = kwargs['optimal_workforce_size_method']            
             self.workforce_dict = kwargs['workforce_dict']
 
             self.outsourcing_cost_multiplier = kwargs['outsourcing_cost_multiplier']
@@ -130,7 +130,7 @@ class Instance:
             self.instance_file_weekend = self.args.instance_file_weekend
             self.shift_file_weekend = self.args.shift_file_weekend
 
-            self.expand_workforce_to_regions = self.args.expand_workforce_to_regions            
+            self.optimal_workforce_size_method = self.args.optimal_workforce_size_method            
             self.workforce_dict = self.args.workforce_dict
 
             self.outsourcing_cost_multiplier = self.args.outsourcing_cost_multiplier
@@ -186,7 +186,9 @@ class Instance:
             self.population[region] = self.i_weekday['geography']['city']['regions'][region]['population']
 
         #optimal workforce size already determined
-        if self.expand_workforce_to_regions == True:
+        if self.optimal_workforce_size_method == True:
+
+            # CHANGE CODE HERE TO READ IN OPTIMAL WORKFORCE SIZE FROM DATABASE BY METHOD
 
             #create workforce_file
             city_pattern = r'(\w+)_db'
@@ -702,7 +704,7 @@ class Solver:
 #function call run execution
 
 #function for workforce size, just for determining the objective value ideally
-def run_objval(model, instance_file_weekday, shift_file_weekday, instance_file_weekend, shift_file_weekend, workforce_dict, outsourcing_cost_multiplier, regional_multiplier, global_multiplier, h_min, h_max, max_n_diff, max_n_shifts=None, expand_workforce_to_regions=None):
+def run_objval(model, instance_file_weekday, shift_file_weekday, instance_file_weekend, shift_file_weekend, workforce_dict, outsourcing_cost_multiplier, regional_multiplier, global_multiplier, h_min, h_max, max_n_diff, max_n_shifts=None, optimal_workforce_size_method=None):
     args = Namespace(
         model=model,
         instance_file_weekday=instance_file_weekday,
@@ -710,7 +712,7 @@ def run_objval(model, instance_file_weekday, shift_file_weekday, instance_file_w
         instance_file_weekend=instance_file_weekend,
         shift_file_weekend = shift_file_weekend,
 
-        expand_workforce_to_regions=expand_workforce_to_regions,
+        optimal_workforce_size_method=optimal_workforce_size_method,
         workforce_dict = workforce_dict,
 
         outsourcing_cost_multiplier=outsourcing_cost_multiplier,
@@ -730,7 +732,7 @@ def run_objval(model, instance_file_weekday, shift_file_weekday, instance_file_w
 
     return roster_results
 
-def run_objval_w_gap(model, instance_file_weekday, shift_file_weekday, instance_file_weekend, shift_file_weekend, workforce_dict, outsourcing_cost_multiplier, regional_multiplier, global_multiplier, h_min, h_max, max_n_diff, max_n_shifts=None, expand_workforce_to_regions=None):
+def run_objval_w_gap(model, instance_file_weekday, shift_file_weekday, instance_file_weekend, shift_file_weekend, workforce_dict, outsourcing_cost_multiplier, regional_multiplier, global_multiplier, h_min, h_max, max_n_diff, max_n_shifts=None, optimal_workforce_size_method=None):
     args = Namespace(
         model=model,
         instance_file_weekday=instance_file_weekday,
@@ -738,7 +740,7 @@ def run_objval_w_gap(model, instance_file_weekday, shift_file_weekday, instance_
         instance_file_weekend=instance_file_weekend,
         shift_file_weekend = shift_file_weekend,
 
-        expand_workforce_to_regions=expand_workforce_to_regions,
+        optimal_workforce_size_method=optimal_workforce_size_method,
         workforce_dict = workforce_dict,
 
         outsourcing_cost_multiplier=outsourcing_cost_multiplier,
@@ -765,7 +767,7 @@ def run_output(model, instance_file_weekday,
                                         shift_file_weekend, workforce_dict, 
                                         outsourcing_cost_multiplier, regional_multiplier, global_multiplier, 
                                         h_min, h_max, max_n_diff, 
-                                        max_n_shifts=None, expand_workforce_to_regions=None):
+                                        max_n_shifts=None, optimal_workforce_size_method=None):
     args = Namespace(
         model=model,
         instance_file_weekday=instance_file_weekday,
@@ -773,7 +775,7 @@ def run_output(model, instance_file_weekday,
         instance_file_weekend=instance_file_weekend,
         shift_file_weekend = shift_file_weekend,
 
-        expand_workforce_to_regions=expand_workforce_to_regions,
+        optimal_workforce_size_method=optimal_workforce_size_method,
         workforce_dict = workforce_dict,
 
         outsourcing_cost_multiplier=outsourcing_cost_multiplier,
@@ -795,7 +797,7 @@ def run_output(model, instance_file_weekday,
     return baseline_results, roster_results
 
 #for determining results with gap
-def run_output_w_gap(model, instance_file_weekday, shift_file_weekday, instance_file_weekend, shift_file_weekend, workforce_dict, outsourcing_cost_multiplier, regional_multiplier, global_multiplier, h_min, h_max, max_n_diff, max_n_shifts=None, expand_workforce_to_regions=None):
+def run_output_w_gap(model, instance_file_weekday, shift_file_weekday, instance_file_weekend, shift_file_weekend, workforce_dict, outsourcing_cost_multiplier, regional_multiplier, global_multiplier, h_min, h_max, max_n_diff, max_n_shifts=None, optimal_workforce_size_method=None):
     args = Namespace(
         model=model,
         instance_file_weekday=instance_file_weekday,
@@ -803,7 +805,7 @@ def run_output_w_gap(model, instance_file_weekday, shift_file_weekday, instance_
         instance_file_weekend=instance_file_weekend,
         shift_file_weekend = shift_file_weekend,
 
-        expand_workforce_to_regions=expand_workforce_to_regions,
+        optimal_workforce_size_method=optimal_workforce_size_method,
         workforce_dict = workforce_dict,
 
         outsourcing_cost_multiplier=outsourcing_cost_multiplier,
