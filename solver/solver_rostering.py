@@ -601,6 +601,8 @@ class Solver:
         return basic_output
 
     def __roster_output(self):
+        # print(self.m.Status)
+        ran_ = self.m.ObjVal
         #decision variables
         #   k: tupledict #(e,a,theta,day)
         k = {}
